@@ -66,6 +66,7 @@
     font-family:'Barlow Condensed',sans-serif; font-weight:700; font-size:26px; letter-spacing:0.02em;
   }
   .brand .tag{font-size:10.5px; color:var(--amber); text-transform:uppercase; letter-spacing:0.14em; font-weight:600;}
+  .topbar .sub{font-size:11px; color:#B9C0BA; margin-top:2px;}
 
   /* ---------- Content ---------- */
   .content{
@@ -75,7 +76,7 @@
   }
   @keyframes fadeIn{ from{opacity:0; transform:translateY(4px);} to{opacity:1; transform:translateY(0);} }
 
-  /* ---------- Search / Summary strip ---------- */
+  /* ---------- Search / filter ---------- */
   .search-row{display:flex; gap:8px; margin-bottom:14px;}
   .search-box{
     flex:1; display:flex; align-items:center; gap:8px;
@@ -85,6 +86,9 @@
   .search-box input{
     border:none; outline:none; background:transparent; font-family:'Inter'; font-size:14px; width:100%; color:var(--ink);
   }
+  .search-box input::placeholder{color:var(--ink-faint);}
+
+  /* ---------- Summary strip ---------- */
   .stat-strip{
     display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin-bottom:16px;
   }
@@ -99,11 +103,15 @@
     font-size:11px; text-transform:uppercase; letter-spacing:0.12em; color:var(--ink-soft);
     margin:18px 2px 8px; font-weight:600;
   }
+  .section-label:first-child{margin-top:0;}
+
   .lot-card{
     background:var(--card); border:1px solid var(--line); border-radius:12px;
     padding:14px; margin-bottom:10px; box-shadow:var(--shadow);
     display:flex; gap:12px; align-items:flex-start;
+    cursor:pointer; transition:transform .12s ease, box-shadow .12s ease;
   }
+  .lot-card:active{transform:scale(0.98);}
   .stamp{
     flex:0 0 auto; width:52px; height:52px; border-radius:50%;
     border:2px solid var(--amber); color:var(--amber-deep);
@@ -113,253 +121,986 @@
     background:repeating-linear-gradient(135deg, rgba(201,138,44,0.07) 0 2px, transparent 2px 6px);
   }
   .lot-main{flex:1; min-width:0;}
-  .lot-vendor{font-weight:700; font-size:15.5px; color:var(--ink);}
+  .lot-top{display:flex; justify-content:space-between; align-items:flex-start; gap:8px;}
+  .lot-vendor{font-weight:700; font-size:15.5px; color:var(--ink); display:flex; align-items:center; gap:6px; flex-wrap:wrap;}
   .vendor-chip{
     font-family:'IBM Plex Mono'; font-size:10px; font-weight:600; color:var(--amber-deep);
     background:rgba(201,138,44,0.12); border:1px solid rgba(201,138,44,0.3); border-radius:5px; padding:1px 6px;
+    white-space:nowrap;
   }
-  .lot-total{font-family:'IBM Plex Mono'; font-weight:600; font-size:15px; color:var(--green-deep);}
+  .lot-total{font-family:'IBM Plex Mono'; font-weight:600; font-size:15px; color:var(--green-deep); white-space:nowrap;}
+  .lot-meta{display:flex; flex-wrap:wrap; gap:6px; margin-top:8px;}
   .chip{
     font-size:10.5px; padding:3px 8px; border-radius:20px; background:var(--paper-alt); color:var(--ink-soft);
-    font-family:'IBM Plex Mono'; margin-top:6px; display:inline-block;
+    font-family:'IBM Plex Mono'; letter-spacing:0.02em;
   }
+  .chip.date{background:transparent; border:1px solid var(--line); color:var(--ink-soft);}
+  .lot-sub{font-size:12px; color:var(--ink-faint); margin-top:6px;}
+
+  .card-edit-btn{
+    flex:0 0 auto; width:28px; height:28px; border-radius:7px; border:1px solid var(--line); background:var(--paper);
+    display:flex; align-items:center; justify-content:center; cursor:pointer;
+  }
+  .card-edit-btn:active{background:var(--paper-alt);}
 
   .status-row{display:flex; gap:8px; margin-top:10px;}
   .status-btn{
     flex:1; padding:8px 6px; border-radius:8px; border:1.5px solid var(--line); background:var(--card);
-    font-size:10.5px; font-weight:700; text-transform:uppercase; text-align:center; color:var(--ink-soft);
+    font-size:10.5px; font-weight:700; text-transform:uppercase; letter-spacing:0.04em; cursor:pointer;
+    text-align:center; color:var(--ink-soft); font-family:'Inter'; display:flex; align-items:center; justify-content:center; gap:5px;
+    transition:all .15s ease;
   }
-  .status-btn.done{opacity:0.5; background:var(--paper-alt); color:var(--ink-faint);}
+  .status-btn .dot{width:7px; height:7px; border-radius:50%; border:1.5px solid currentColor; flex:0 0 auto;}
+  .status-btn.pending.stock{border-color:var(--amber); color:var(--amber-deep);}
+  .status-btn.pending.payment{border-color:var(--green); color:var(--green-deep);}
+  .status-btn.done{opacity:0.5; background:var(--paper-alt); border-color:var(--paper-alt); color:var(--ink-faint);}
+  .status-btn.done .dot{background:currentColor;}
+  .status-btn:active{transform:scale(0.97);}
 
-  /* ---------- Forms & Management ---------- */
+  .empty-state{
+    text-align:center; padding:60px 20px; color:var(--ink-soft);
+  }
+  .empty-state .icon{font-size:34px; margin-bottom:10px; opacity:.6;}
+  .empty-state .title{font-weight:700; font-size:16px; color:var(--ink); margin-bottom:4px;}
+  .empty-state .desc{font-size:13px; line-height:1.5;}
+  .empty-state button{margin-top:16px;}
+
+  /* ---------- Forms ---------- */
   .form-card{
     background:var(--card); border:1px solid var(--line); border-radius:12px; padding:16px; margin-bottom:14px;
   }
+  .field{margin-bottom:14px;}
   .field label{
-    display:block; font-size:11px; text-transform:uppercase; font-weight:600; color:var(--ink-soft); margin-bottom:6px;
+    display:block; font-size:11px; text-transform:uppercase; letter-spacing:0.08em; font-weight:600;
+    color:var(--ink-soft); margin-bottom:6px;
   }
-  .field input{
-    width:100%; padding:11px 12px; border:1px solid var(--line); border-radius:8px; margin-bottom:12px;
-    font-family:'Inter'; font-size:14.5px; background:var(--paper);
+  .field input, .field select{
+    width:100%; padding:11px 12px; border:1px solid var(--line); border-radius:8px;
+    font-family:'Inter'; font-size:14.5px; background:var(--paper); color:var(--ink); outline:none;
+    transition:border-color .12s ease;
   }
-  button.primary{
-    width:100%; padding:14px; border:none; border-radius:10px; background:var(--green); color:#fff;
-    font-weight:700; font-size:15px; cursor:pointer;
+  .field input:focus, .field select:focus{border-color:var(--green);}
+  .field-row{display:grid; grid-template-columns:1fr 1fr; gap:10px;}
+
+  .item-row{
+    border:1px dashed var(--line); border-radius:10px; padding:12px; margin-bottom:10px; background:var(--paper);
+    position:relative;
   }
-  button.secondary{
-    width:100%; padding:12px; border:1px solid var(--line); border-radius:10px; background:var(--card); color:var(--ink);
-    font-weight:600; font-size:14px; cursor:pointer;
+  .item-row .item-head{display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;}
+  .item-row .item-idx{font-family:'IBM Plex Mono'; font-size:11px; color:var(--ink-faint);}
+  .item-row .remove-btn{
+    background:none; border:none; color:var(--red); font-size:12px; font-weight:600; cursor:pointer; padding:2px 6px;
+    font-family:'Inter';
+  }
+  .item-grid{display:grid; grid-template-columns:1fr 1fr; gap:8px;}
+  .item-grid .full{grid-column:1/-1;}
+  .item-amount{
+    text-align:right; font-family:'IBM Plex Mono'; font-size:12.5px; color:var(--green-deep); margin-top:8px; font-weight:600;
   }
 
-  /* ---------- Summary visuals ---------- */
+  .add-item-btn{
+    width:100%; padding:12px; border:1.5px dashed var(--green); background:transparent; color:var(--green-deep);
+    border-radius:10px; font-weight:600; font-size:13.5px; cursor:pointer; margin-bottom:16px;
+    font-family:'Inter';
+  }
+  .add-item-btn:active{background:rgba(59,110,92,0.08);}
+
+  .lot-total-bar{
+    display:flex; justify-content:space-between; align-items:center; padding:14px 16px; background:var(--ink);
+    color:var(--paper); border-radius:12px; margin-bottom:14px;
+  }
+  .lot-total-bar .lbl{font-size:11px; text-transform:uppercase; letter-spacing:0.1em; color:#B9C0BA;}
+  .lot-total-bar .amt{font-family:'IBM Plex Mono'; font-weight:600; font-size:20px; color:var(--amber);}
+  .lot-total-bar .recalc-link{font-size:11px; color:var(--amber); text-decoration:underline; cursor:pointer; margin-top:4px;}
+  .lot-total-bar .total-input{
+    width:130px; text-align:right; font-size:19px; font-weight:600; color:var(--amber);
+    background:rgba(255,255,255,0.08); border:1.5px solid rgba(255,255,255,0.18); border-radius:8px;
+    padding:8px 10px;
+  }
+  .lot-total-bar .total-input:focus{outline:none; border-color:var(--amber);}
+
+  button.primary{
+    width:100%; padding:14px; border:none; border-radius:10px; background:var(--green); color:#fff;
+    font-weight:700; font-size:15px; cursor:pointer; font-family:'Inter'; letter-spacing:0.01em;
+    transition:background .12s ease;
+  }
+  button.primary:active{background:var(--green-deep);}
+  button.secondary{
+    width:100%; padding:13px; border:1px solid var(--line); border-radius:10px; background:var(--card); color:var(--ink);
+    font-weight:600; font-size:14px; cursor:pointer; font-family:'Inter'; margin-top:8px;
+  }
+  button.danger{
+    width:100%; padding:13px; border:1px solid rgba(176,67,46,0.3); border-radius:10px; background:transparent; color:var(--red);
+    font-weight:600; font-size:14px; cursor:pointer; font-family:'Inter'; margin-top:8px;
+  }
+
+  /* ---------- Detail view ---------- */
+  .detail-item{
+    display:flex; justify-content:space-between; align-items:center; padding:12px 0; border-bottom:1px solid var(--line);
+  }
+  .detail-item:last-child{border-bottom:none;}
+  .detail-item .di-name{font-weight:600; font-size:14px;}
+  .detail-item .di-sub{font-size:12px; color:var(--ink-soft); margin-top:2px;}
+  .detail-item .di-amt{font-family:'IBM Plex Mono'; font-weight:600; font-size:14px; color:var(--green-deep); white-space:nowrap;}
+
+  .kv-grid{display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:4px;}
+  .kv{padding:2px 0;}
+  .kv .k{font-size:10.5px; text-transform:uppercase; letter-spacing:0.08em; color:var(--ink-faint); margin-bottom:3px;}
+  .kv .v{font-size:14px; font-weight:600; color:var(--ink);}
+  .kv .v.mono{font-family:'IBM Plex Mono'; font-size:13px;}
+
+  /* ---------- Summary view ---------- */
+  .filter-row{display:flex; gap:8px; margin-bottom:16px; flex-wrap:wrap;}
+  .filter-chip{
+    padding:8px 14px; border-radius:20px; border:1.5px solid var(--line); background:var(--card);
+    font-size:12.5px; font-weight:600; color:var(--ink-soft); cursor:pointer; font-family:'Inter';
+  }
+  .filter-chip.active{background:var(--ink); border-color:var(--ink); color:var(--amber);}
+
   .donut-grid{display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:16px;}
   .donut-card{background:var(--card); border:1px solid var(--line); border-radius:12px; padding:14px; text-align:center;}
+  .donut-card .donut-title{font-size:11px; text-transform:uppercase; letter-spacing:0.06em; color:var(--ink-soft); font-weight:600; margin-bottom:8px;}
+  .donut-card .donut-sub{font-size:11.5px; color:var(--ink-faint); margin-top:6px;}
+
+  .trend-chart{
+    display:flex; align-items:flex-end; gap:8px; height:120px; padding:10px 4px 0;
+  }
+  .trend-bar-wrap{flex:1; display:flex; flex-direction:column; align-items:center; height:100%; justify-content:flex-end; gap:6px;}
+  .trend-bar{
+    width:100%; max-width:34px; background:var(--amber); border-radius:5px 5px 3px 3px; min-height:3px;
+    transition:height .3s ease;
+  }
+  .trend-bar.current{background:var(--green);}
+  .trend-lbl{font-size:9.5px; color:var(--ink-soft); font-weight:600; text-transform:uppercase;}
+  .trend-val{font-size:9px; color:var(--ink-faint); font-family:'IBM Plex Mono';}
+
   .breakdown-row{
     display:flex; justify-content:space-between; align-items:center; padding:11px 0; border-bottom:1px solid var(--line);
   }
+  .breakdown-row:last-child{border-bottom:none;}
+  .breakdown-row .name{font-size:13.5px; font-weight:600;}
+  .breakdown-row .bar-wrap{flex:1; margin:0 12px; height:6px; background:var(--paper-alt); border-radius:4px; overflow:hidden;}
+  .breakdown-row .bar{height:100%; background:var(--amber); border-radius:4px;}
+  .breakdown-row .val{font-family:'IBM Plex Mono'; font-size:12.5px; color:var(--ink-soft); white-space:nowrap;}
 
   /* ---------- Bottom nav ---------- */
   .bottom-nav{
     position:fixed; bottom:0; left:50%; transform:translateX(-50%);
     width:100%; max-width:520px; background:var(--ink); border-top:3px solid var(--amber);
     display:flex; z-index:30;
+    padding-bottom:env(safe-area-inset-bottom, 0);
   }
   .nav-btn{
     flex:1; background:none; border:none; color:#B9C0BA; padding:10px 2px 8px; display:flex; flex-direction:column;
-    align-items:center; gap:3px; font-size:9px; text-transform:uppercase; font-weight:600;
+    align-items:center; gap:3px; cursor:pointer; font-family:'Inter'; font-size:9px; font-weight:600;
+    letter-spacing:0.01em; text-transform:uppercase;
   }
   .nav-btn.active{color:var(--amber);}
   .nav-btn svg{width:18px; height:18px;}
 
-  .toast{
-    position:fixed; bottom:90px; left:50%; transform:translateX(-50%);
-    background:var(--ink); color:var(--paper); padding:10px 18px; border-radius:30px; font-size:13px;
-    box-shadow:var(--shadow); z-index:50; opacity:0; transition:opacity .2s ease; pointer-events:none;
+  .header-row{display:flex; align-items:center; gap:10px; margin-bottom:16px;}
+  .back-btn{
+    background:var(--card); border:1px solid var(--line); border-radius:8px; width:36px; height:36px;
+    display:flex; align-items:center; justify-content:center; cursor:pointer; flex:0 0 auto;
   }
-  .toast.show{opacity:1;}
-  .loading{display:flex; align-items:center; justify-content:center; min-height:60vh;}
+  .header-title{font-family:'Barlow Condensed'; font-weight:700; font-size:22px;}
+  .header-title .sub{font-size:12px; color:var(--ink-soft); font-family:'Inter'; font-weight:400; margin-top:1px;}
+  .count-pill{
+    background:var(--amber); color:#fff; font-family:'IBM Plex Mono'; font-size:11px; font-weight:600;
+    border-radius:20px; padding:3px 10px; margin-left:8px; display:inline-block;
+  }
+
+  .toast{
+    position:fixed; bottom:80px; left:50%; transform:translateX(-50%);
+    background:var(--ink); color:var(--paper); padding:10px 18px; border-radius:30px; font-size:13px;
+    box-shadow:var(--shadow); z-index:50; opacity:0; pointer-events:none; transition:opacity .2s ease, bottom .2s ease;
+  }
+  .toast.show{opacity:1; bottom:90px;}
+
+  .loading{display:flex; align-items:center; justify-content:center; min-height:60vh; color:var(--ink-soft); font-size:14px;}
 </style>
 </head>
 <body>
 <div id="app">
   <div class="topbar">
-    <div class="brand"><span class="mark">LOTBOOK</span><span class="tag">Ledger</span></div>
+    <div class="brand">
+      <span class="mark">LOTBOOK</span>
+      <span class="tag">Stock &amp; Purchase</span>
+    </div>
   </div>
   <div class="content" id="content">
-    <div class="loading">Loading records...</div>
+    <div class="loading">Opening the ledger…</div>
   </div>
   <div class="bottom-nav" id="bottomNav"></div>
 </div>
 <div class="toast" id="toast"></div>
 
 <script>
-/* ============================ STATE & STORAGE ============================ */
-const STORAGE_KEY = 'lots-data';
+/* ============================ STATE ============================ */
 const state = {
   lots: [],
-  tab: 'list',
-  editingId: null,
-  viewingId: null,
+  tab: 'list',          // 'list' | 'add' | 'summary' | 'detail' | 'pending' | 'dues'
+  editingId: null,       // lot id being edited (form)
+  viewingId: null,       // lot id being viewed (detail)
+  detailReturnTab: 'list',
+  editReturnTab: null,
   search: '',
-  draft: null,
-  summaryFilter: 'all',
+  draft: null,           // working copy of a lot while adding/editing
+  summaryFilter: 'all',  // 'all' | 'month' | 'lastmonth'
   loaded: false
 };
 
+const STORAGE_KEY = 'lots-data';
+
+/* ============================ STORAGE ============================ */
 async function loadData(){
-  const raw = localStorage.getItem(STORAGE_KEY);
-  state.lots = raw ? JSON.parse(raw) : [];
+  try{
+    const raw = localStorage.getItem(STORAGE_KEY);
+    state.lots = raw ? JSON.parse(raw) : [];
+  }catch(e){
+    state.lots = [];
+    showToast('Could not read saved data on this device');
+  }
   state.loaded = true;
 }
 
 async function saveData(){
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(state.lots));
+  try{
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state.lots));
+  }catch(e){
+    showToast('Storage full or unavailable — changes may not be saved');
+  }
 }
 
 /* ============================ HELPERS ============================ */
-function uid(p){ return p + '_' + Date.now().toString(36); }
-function fmtMoney(n){ return '₹' + (Number(n)||0).toLocaleString('en-IN'); }
-function escapeHtml(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function uid(prefix){ return prefix + '_' + Date.now().toString(36) + Math.random().toString(36).slice(2,7); }
 
+function nextLotNumber(){
+  const max = state.lots.reduce((m,l)=> Math.max(m, l.number||0), 0);
+  return max + 1;
+}
+
+function lotNumberLabel(n){ return 'LOT-' + String(n).padStart(4,'0'); }
+
+function fmtMoney(n){
+  const v = Number(n)||0;
+  return '₹' + v.toLocaleString('en-IN', {maximumFractionDigits:2, minimumFractionDigits: v % 1 === 0 ? 0 : 2});
+}
+
+function fmtDate(d){
+  if(!d) return '—';
+  const dt = new Date(d + 'T00:00:00');
+  if(isNaN(dt)) return d;
+  return dt.toLocaleDateString('en-IN', {day:'2-digit', month:'short', year:'numeric'});
+}
+
+function lotItemTotal(item){ return (Number(item.qty)||0) * (Number(item.rate)||0); }
 function lotTotal(lot){
-  if(lot.total) return Number(lot.total);
-  return lot.items.reduce((s,it)=> s + (Number(it.qty)*Number(it.rate)), 0);
+  if(lot.total !== undefined && lot.total !== null && lot.total !== ''){
+    const n = Number(lot.total);
+    if(!isNaN(n)) return n;
+  }
+  return lot.items.reduce((s,it)=> s + lotItemTotal(it), 0);
+}
+function computedItemsTotal(items){ return items.reduce((s,it)=> s + lotItemTotal(it), 0); }
+function lotQty(lot){ return lot.items.reduce((s,it)=> s + (Number(it.qty)||0), 0); }
+
+/* ---- Month / vendor-sequence helpers ---- */
+function monthKey(dateStr){ return (dateStr||'').slice(0,7); } // 'YYYY-MM'
+function currentMonthKey(){ return new Date().toISOString().slice(0,7); }
+function monthKeyOffset(offset){
+  const now = new Date();
+  const d = new Date(now.getFullYear(), now.getMonth()+offset, 1);
+  return d.toISOString().slice(0,7);
+}
+function monthLabel(key){
+  if(!key) return '';
+  const [y,m] = key.split('-');
+  const d = new Date(Number(y), Number(m)-1, 1);
+  return d.toLocaleDateString('en-IN', {month:'long', year:'numeric'});
+}
+function monthShortLabel(key){
+  if(!key) return '';
+  const [y,m] = key.split('-');
+  const d = new Date(Number(y), Number(m)-1, 1);
+  return d.toLocaleDateString('en-IN', {month:'short'});
+}
+// Sequence number of this lot among lots from the same vendor within the same calendar month
+function vendorLotNumber(lot){
+  const vKey = (lot.vendor||'').trim().toLowerCase();
+  const mKey = monthKey(lot.date);
+  const group = state.lots
+    .filter(l => (l.vendor||'').trim().toLowerCase() === vKey && monthKey(l.date) === mKey)
+    .sort((a,b)=> a.createdAt - b.createdAt);
+  const idx = group.findIndex(l=>l.id===lot.id);
+  return idx >= 0 ? idx + 1 : group.length + 1;
+}
+function filterLotsByPeriod(filter){
+  if(filter === 'month') return state.lots.filter(l => monthKey(l.date) === currentMonthKey());
+  if(filter === 'lastmonth') return state.lots.filter(l => monthKey(l.date) === monthKeyOffset(-1));
+  return state.lots;
+}
+function monthlyTrend(lots, monthsBack){
+  const map = {};
+  lots.forEach(l=>{ const k = monthKey(l.date); if(!k) return; map[k] = (map[k]||0) + lotTotal(l); });
+  const out = [];
+  for(let i=monthsBack-1;i>=0;i--){
+    const k = monthKeyOffset(-i);
+    out.push({key:k, label: monthShortLabel(k), value: map[k]||0, isCurrent: k === currentMonthKey()});
+  }
+  return out;
+}
+function donutSVG(pct, colorDone, colorPending, size, stroke){
+  size = size || 108; stroke = stroke || 12;
+  const p = Math.max(0, Math.min(100, pct));
+  const r = (size - stroke)/2;
+  const c = 2*Math.PI*r;
+  const doneLen = c * (p/100);
+  return `
+    <svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}">
+      <circle cx="${size/2}" cy="${size/2}" r="${r}" fill="none" stroke="${colorPending}" stroke-width="${stroke}" />
+      <circle cx="${size/2}" cy="${size/2}" r="${r}" fill="none" stroke="${colorDone}" stroke-width="${stroke}"
+        stroke-dasharray="${doneLen.toFixed(1)} ${(c-doneLen).toFixed(1)}" stroke-linecap="round"
+        transform="rotate(-90 ${size/2} ${size/2})"/>
+      <text x="50%" y="50%" text-anchor="middle" dominant-baseline="central" font-family="IBM Plex Mono" font-weight="600" font-size="18" fill="#1F2A24">${Math.round(p)}%</text>
+    </svg>`;
 }
 
 function showToast(msg){
   const t = document.getElementById('toast');
-  t.textContent = msg; t.classList.add('show');
-  setTimeout(()=> t.classList.remove('show'), 2000);
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(showToast._timer);
+  showToast._timer = setTimeout(()=> t.classList.remove('show'), 2200);
 }
 
-/* ============================ BACKUP LOGIC ============================ */
-function exportBackup() {
-  if (state.lots.length === 0) return showToast('No data to export');
-  const data = JSON.stringify(state.lots, null, 2);
-  const blob = new Blob([data], { type: 'application/json' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = `lotbook_backup_${new Date().toISOString().slice(0,10)}.json`;
-  a.click();
-  URL.revokeObjectURL(url);
-  showToast('Backup saved to device');
+function escapeHtml(s){
+  return String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 }
 
-function importBackup(e) {
-  const file = e.target.files[0];
-  if (!file) return;
-  const reader = new FileReader();
-  reader.onload = async (event) => {
-    try {
-      const imported = JSON.parse(event.target.result);
-      if (confirm(`Restore ${imported.length} lots? This replaces current data.`)) {
-        state.lots = imported;
-        await saveData();
-        render();
-        showToast('Restore complete!');
-      }
-    } catch (err) { showToast('Invalid backup file'); }
+function blankItem(){ return {id: uid('item'), name:'', qty:'', color:'', rate:''}; }
+
+function blankLot(){
+  return {
+    id: uid('lot'),
+    number: nextLotNumber(),
+    vendor:'',
+    date: new Date().toISOString().slice(0,10),
+    creditCard:'',
+    orderId:'',
+    items:[blankItem()],
+    total:0,
+    totalTouched:false,
+    stockReceived:false,
+    paymentDone:false,
+    createdAt: Date.now()
   };
-  reader.readAsText(file);
 }
 
-/* ============================ RENDERERS ============================ */
-
-function renderNav(){
-  const navs = [
-    {id:'list', label:'Lots', icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2 2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>'},
-    {id:'add', label:'Add', icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v8M8 12h8"/></svg>'},
-    {id:'summary', label:'Stats', icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"/><rect x="7" y="12" width="3" height="6"/><rect x="12" y="8" width="3" height="10"/><rect x="17" y="5" width="3" height="13"/></svg>'}
-  ];
-  document.getElementById('bottomNav').innerHTML = navs.map(n => `
-    <button class="nav-btn ${state.tab===n.id?'active':''}" onclick="goTab('${n.id}')">
-      ${n.icon}<span>${n.label}</span>
-    </button>
-  `).join('');
-}
-
-function renderList(){
-  let html = `<div class="stat-strip">
-    <div class="stat-box"><div class="num">${state.lots.length}</div><div class="lbl">Lots</div></div>
-    <div class="stat-box"><div class="num">${fmtMoney(state.lots.reduce((s,l)=>s+lotTotal(l),0))}</div><div class="lbl">Total</div></div>
-  </div>`;
-
-  if(state.lots.length === 0) {
-    html += '<div style="text-align:center; padding:40px;">No lots logged yet. Click Add.</div>';
-  } else {
-    html += state.lots.map(l => `
-      <div class="lot-card">
-        <div class="stamp">LOT</div>
-        <div class="lot-main">
-          <div style="display:flex; justify-content:space-between;">
-            <div class="lot-vendor">${escapeHtml(l.vendor)}</div>
-            <div class="lot-total">${fmtMoney(lotTotal(l))}</div>
-          </div>
-          <span class="chip">${l.date}</span>
-        </div>
-      </div>
-    `).join('');
+/* ============================ NAV ============================ */
+function goTab(tab){
+  state.tab = tab;
+  if(tab === 'add' && !state.editingId){
+    state.draft = blankLot();
   }
-  document.getElementById('content').innerHTML = html;
+  render();
 }
 
-function renderForm(){
-  document.getElementById('content').innerHTML = `
-    <div class="header-row"><h3>New Lot</h3></div>
-    <div class="form-card">
-      <div class="field"><label>Vendor</label><input id="f_vendor" placeholder="Name" /></div>
-      <div class="field"><label>Date</label><input id="f_date" type="date" value="${new Date().toISOString().slice(0,10)}" /></div>
-      <div class="field"><label>Total Amount (₹)</label><input id="f_total" type="number" placeholder="0.00" /></div>
-      <button class="primary" onclick="saveNewLot()">Save Lot</button>
-    </div>
-  `;
+function openDetail(id, fromTab){
+  state.viewingId = id;
+  state.detailReturnTab = fromTab || (['list','pending','dues'].includes(state.tab) ? state.tab : 'list');
+  state.tab = 'detail';
+  render();
 }
 
-function renderSummary(){
-  let html = `
-    <h3>Summary</h3>
-    <div class="stat-strip">
-        <div class="stat-box"><div class="num">${state.lots.length}</div><div class="lbl">Total Lots</div></div>
-    </div>
+function openEdit(id, fromTab){
+  const lot = state.lots.find(l=>l.id===id);
+  if(!lot) return;
+  state.draft = JSON.parse(JSON.stringify(lot));
+  state.draft.total = lotTotal(lot);
+  state.draft.totalTouched = !!(lot.total !== undefined && lot.total !== null && lot.total !== '');
+  state.editingId = id;
+  state.editReturnTab = fromTab || (state.viewingId ? 'detail' : (['list','pending','dues'].includes(state.tab) ? state.tab : 'list'));
+  state.tab = 'add';
+  render();
+}
 
-    <div class="section-label">Data Management</div>
-    <div class="form-card">
-      <p style="font-size:12px; color:var(--ink-soft); margin-bottom:12px;">Back up your ledger to your phone or restore from a file.</p>
-      <button class="secondary" onclick="exportBackup()" style="margin-bottom:10px;">📤 Export Backup (.json)</button>
-      <button class="secondary" onclick="document.getElementById('fileInput').click()">📥 Restore from File</button>
-      <input type="file" id="fileInput" accept=".json" style="display:none;" onchange="importBackup(event)" />
-    </div>
-  `;
-  document.getElementById('content').innerHTML = html;
+function cancelForm(){
+  state.draft = null;
+  state.editingId = null;
+  state.tab = state.viewingId ? 'detail' : (state.editReturnTab || 'list');
+  state.editReturnTab = null;
+  render();
 }
 
 /* ============================ ACTIONS ============================ */
-function goTab(t){ state.tab = t; render(); }
+async function saveDraft(){
+  const d = state.draft;
+  if(!d.vendor.trim()){ showToast('Add who you purchased from'); return; }
+  const validItems = d.items.filter(it => it.name.trim());
+  if(validItems.length === 0){ showToast('Add at least one item'); return; }
+  d.items = validItems.map(it => ({...it, qty: Number(it.qty)||0, rate: Number(it.rate)||0}));
+  d.total = Number(d.total);
+  if(isNaN(d.total)) d.total = computedItemsTotal(d.items);
+  delete d.totalTouched;
 
-async function saveNewLot(){
-  const vendor = document.getElementById('f_vendor').value;
-  const total = document.getElementById('f_total').value;
-  const date = document.getElementById('f_date').value;
-  if(!vendor || !total) return showToast('Please fill vendor and amount');
-
-  state.lots.unshift({ id: uid('l'), vendor, total, date, items:[] });
+  const origin = state.editReturnTab || state.detailReturnTab || 'list';
+  const idx = state.lots.findIndex(l=>l.id===d.id);
+  if(idx >= 0){ state.lots[idx] = d; } else { state.lots.unshift(d); }
   await saveData();
-  showToast('Lot saved!');
-  state.tab = 'list';
+  showToast(state.editingId ? 'Lot updated' : 'Lot saved');
+  state.editingId = null;
+  state.editReturnTab = null;
+  state.draft = null;
+  state.viewingId = d.id;
+  state.detailReturnTab = origin;
+  state.tab = 'detail';
   render();
 }
 
-function render(){
-  renderNav();
-  if(state.tab === 'list') renderList();
-  if(state.tab === 'add') renderForm();
-  if(state.tab === 'summary') renderSummary();
+async function toggleStatus(id, field){
+  const lot = state.lots.find(l=>l.id===id);
+  if(!lot) return;
+  lot[field] = !lot[field];
+  await saveData();
+  render();
 }
 
+async function deleteLot(id){
+  state.lots = state.lots.filter(l=>l.id!==id);
+  await saveData();
+  state.tab = state.detailReturnTab || 'list';
+  state.viewingId = null;
+  showToast('Lot deleted');
+  render();
+}
+
+function addItemRow(){
+  state.draft.items.push(blankItem());
+  render();
+}
+function removeItemRow(itemId){
+  if(state.draft.items.length <= 1) return;
+  state.draft.items = state.draft.items.filter(it=>it.id!==itemId);
+  render();
+}
+function updateDraftField(field, value){ state.draft[field] = value; }
+function updateItemField(itemId, field, value){
+  const it = state.draft.items.find(i=>i.id===itemId);
+  if(it) it[field] = value;
+}
+
+/* ============================ RENDER: NAV ============================ */
+function renderNav(){
+  const items = [
+    {id:'list', label:'Lots', icon:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>`},
+    {id:'pending', label:'Stock Due', icon:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>`},
+    {id:'add', label:'Add Lot', icon:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v8M8 12h8"/></svg>`},
+    {id:'dues', label:'Pay Due', icon:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>`},
+    {id:'summary', label:'Summary', icon:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><rect x="7" y="12" width="3" height="6"/><rect x="12" y="8" width="3" height="10"/><rect x="17" y="5" width="3" height="13"/></svg>`}
+  ];
+  const nav = document.getElementById('bottomNav');
+  const activeId = state.tab === 'detail' ? state.detailReturnTab : state.tab;
+  nav.innerHTML = items.map(it => `
+    <button class="nav-btn ${activeId===it.id ? 'active':''}" data-nav="${it.id}">
+      ${it.icon}
+      <span>${it.label}</span>
+    </button>
+  `).join('');
+  nav.querySelectorAll('[data-nav]').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      state.editingId = null; state.viewingId = null; state.editReturnTab = null;
+      goTab(btn.dataset.nav);
+    });
+  });
+}
+
+/* ============================ SHARED: LOT CARD ============================ */
+function lotCardHTML(lot){
+  const total = lotTotal(lot);
+  const qty = lotQty(lot);
+  const itemNames = lot.items.slice(0,3).map(i=>i.name).filter(Boolean).join(', ');
+  return `
+    <div class="lot-card" data-open="${lot.id}">
+      <div class="stamp">${lotNumberLabel(lot.number)}</div>
+      <div class="lot-main">
+        <div class="lot-top">
+          <div class="lot-vendor">${escapeHtml(lot.vendor)} <span class="vendor-chip">${monthShortLabel(monthKey(lot.date)).toUpperCase()} #${vendorLotNumber(lot)}</span></div>
+          <div style="display:flex; align-items:center; gap:8px;">
+            <div class="lot-total">${fmtMoney(total)}</div>
+            <div class="card-edit-btn" data-edit="${lot.id}" title="Edit lot">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#1F2A24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
+            </div>
+          </div>
+        </div>
+        <div class="lot-sub">${escapeHtml(itemNames)}${lot.items.length>3 ? ` +${lot.items.length-3} more` : ''} · ${qty} pcs</div>
+        <div class="lot-meta">
+          <span class="chip date">${fmtDate(lot.date)}</span>
+          ${lot.orderId ? `<span class="chip">#${escapeHtml(lot.orderId)}</span>` : ''}
+          ${lot.creditCard ? `<span class="chip">💳 ${escapeHtml(lot.creditCard)}</span>` : ''}
+        </div>
+        <div class="status-row">
+          <div class="status-btn ${lot.stockReceived ? 'done' : 'pending stock'}" data-status="${lot.id}|stockReceived">
+            <span class="dot"></span>${lot.stockReceived ? 'Stock received' : 'Stock received?'}
+          </div>
+          <div class="status-btn ${lot.paymentDone ? 'done' : 'pending payment'}" data-status="${lot.id}|paymentDone">
+            <span class="dot"></span>${lot.paymentDone ? 'Payment done' : 'Payment done?'}
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+}
+function wireLotCardEvents(originTab){
+  document.querySelectorAll('[data-open]').forEach(el=>{
+    el.addEventListener('click', ()=> openDetail(el.dataset.open, originTab));
+  });
+  document.querySelectorAll('[data-edit]').forEach(el=>{
+    el.addEventListener('click', (e)=>{ e.stopPropagation(); openEdit(el.dataset.edit, originTab); });
+  });
+  document.querySelectorAll('[data-status]').forEach(el=>{
+    el.addEventListener('click', (e)=>{
+      e.stopPropagation();
+      const [id, field] = el.dataset.status.split('|');
+      toggleStatus(id, field);
+    });
+  });
+}
+
+/* ============================ RENDER: LIST ============================ */
+function renderList(){
+  const q = state.search.trim().toLowerCase();
+  let lots = [...state.lots].sort((a,b)=> b.createdAt - a.createdAt);
+  if(q){
+    lots = lots.filter(l =>
+      l.vendor.toLowerCase().includes(q) ||
+      (l.orderId||'').toLowerCase().includes(q) ||
+      (l.creditCard||'').toLowerCase().includes(q) ||
+      l.items.some(it => it.name.toLowerCase().includes(q) || (it.color||'').toLowerCase().includes(q))
+    );
+  }
+
+  const totalValue = state.lots.reduce((s,l)=> s + lotTotal(l), 0);
+  const totalItems = state.lots.reduce((s,l)=> s + lotQty(l), 0);
+
+  let html = `
+    <div class="stat-strip">
+      <div class="stat-box"><div class="num">${state.lots.length}</div><div class="lbl">Lots</div></div>
+      <div class="stat-box"><div class="num">${totalItems}</div><div class="lbl">Pcs Stocked</div></div>
+      <div class="stat-box"><div class="num mono" style="font-size:15px;">${fmtMoney(totalValue)}</div><div class="lbl">Total Value</div></div>
+    </div>
+    <div class="search-row">
+      <div class="search-box">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#8A9088" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+        <input id="searchInput" placeholder="Search vendor, item, order ID, card…" value="${escapeHtml(state.search)}" />
+      </div>
+    </div>
+  `;
+
+  if(lots.length === 0){
+    html += `
+      <div class="empty-state">
+        <div class="icon">🗃️</div>
+        <div class="title">${q ? 'No matching lots' : 'No lots yet'}</div>
+        <div class="desc">${q ? 'Try a different search term.' : 'Every purchase you log — vendor, items, colors, rates — shows up here as a lot.'}</div>
+        ${!q ? `<button class="primary" style="width:auto; padding:12px 22px;" id="emptyAddBtn">+ Log your first lot</button>` : ''}
+      </div>
+    `;
+  } else {
+    html += `<div class="section-label">${q ? lots.length + ' result' + (lots.length===1?'':'s') : 'Recent lots'}</div>`;
+    html += lots.map(lotCardHTML).join('');
+  }
+
+  document.getElementById('content').innerHTML = html;
+
+  const search = document.getElementById('searchInput');
+  if(search){
+    search.addEventListener('input', e=>{ state.search = e.target.value; render(); });
+    // restore cursor focus at end
+    search.focus();
+    const val = search.value; search.value=''; search.value = val;
+  }
+  wireLotCardEvents('list');
+  const emptyAddBtn = document.getElementById('emptyAddBtn');
+  if(emptyAddBtn) emptyAddBtn.addEventListener('click', ()=> { state.editingId=null; goTab('add'); });
+}
+
+/* ============================ RENDER: PENDING STOCK ============================ */
+function renderPending(){
+  const mKey = currentMonthKey();
+  const lots = state.lots
+    .filter(l => monthKey(l.date) === mKey && !l.stockReceived)
+    .sort((a,b)=> b.createdAt - a.createdAt);
+
+  let html = `
+    <div class="header-row">
+      <div class="header-title">Stock to receive<div class="sub">${monthLabel(mKey)} · resets each month</div></div>
+      <span class="count-pill">${lots.length}</span>
+    </div>
+  `;
+
+  if(lots.length === 0){
+    html += `
+      <div class="empty-state">
+        <div class="icon">📦</div>
+        <div class="title">All caught up</div>
+        <div class="desc">No pending stock this month. Anything marked "Stock received" won't show here.</div>
+      </div>
+    `;
+  } else {
+    html += lots.map(lotCardHTML).join('');
+  }
+  document.getElementById('content').innerHTML = html;
+  wireLotCardEvents('pending');
+}
+
+/* ============================ RENDER: PAYMENTS DUE ============================ */
+function renderDues(){
+  const mKey = currentMonthKey();
+  const lots = state.lots
+    .filter(l => monthKey(l.date) === mKey && !l.paymentDone)
+    .sort((a,b)=> b.createdAt - a.createdAt);
+
+  const totalDue = lots.reduce((s,l)=> s + lotTotal(l), 0);
+
+  let html = `
+    <div class="header-row">
+      <div class="header-title">Payments due<div class="sub">${monthLabel(mKey)} · resets each month</div></div>
+      <span class="count-pill">${lots.length}</span>
+    </div>
+  `;
+  if(lots.length > 0){
+    html += `<div class="lot-total-bar"><span class="lbl">Total outstanding</span><span class="amt">${fmtMoney(totalDue)}</span></div>`;
+  }
+
+  if(lots.length === 0){
+    html += `
+      <div class="empty-state">
+        <div class="icon">💳</div>
+        <div class="title">Nothing owed</div>
+        <div class="desc">No unpaid lots this month. Anything marked "Payment done" won't show here.</div>
+      </div>
+    `;
+  } else {
+    html += lots.map(lotCardHTML).join('');
+  }
+  document.getElementById('content').innerHTML = html;
+  wireLotCardEvents('dues');
+}
+
+/* ============================ RENDER: DETAIL ============================ */
+function renderDetail(){
+  const lot = state.lots.find(l=>l.id===state.viewingId);
+  if(!lot){ state.tab='list'; render(); return; }
+  const total = lotTotal(lot);
+
+  const html = `
+    <div class="header-row">
+      <div class="back-btn" id="backBtn"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#1F2A24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg></div>
+      <div class="header-title">${lotNumberLabel(lot.number)}<div class="sub">${escapeHtml(lot.vendor)} <span class="vendor-chip">${monthShortLabel(monthKey(lot.date)).toUpperCase()} #${vendorLotNumber(lot)}</span></div></div>
+    </div>
+
+    <div class="lot-total-bar">
+      <span class="lbl">Lot total${(lot.total !== undefined && lot.total !== null && lot.total !== '') ? ' · edited' : ''}</span>
+      <span class="amt">${fmtMoney(total)}</span>
+    </div>
+
+    <div class="status-row" style="margin-bottom:14px;">
+      <div class="status-btn ${lot.stockReceived ? 'done' : 'pending stock'}" data-status="${lot.id}|stockReceived">
+        <span class="dot"></span>${lot.stockReceived ? 'Stock received' : 'Stock received?'}
+      </div>
+      <div class="status-btn ${lot.paymentDone ? 'done' : 'pending payment'}" data-status="${lot.id}|paymentDone">
+        <span class="dot"></span>${lot.paymentDone ? 'Payment done' : 'Payment done?'}
+      </div>
+    </div>
+
+    <div class="form-card">
+      <div class="kv-grid">
+        <div class="kv"><div class="k">Purchased from</div><div class="v">${escapeHtml(lot.vendor)}</div></div>
+        <div class="kv"><div class="k">Date</div><div class="v">${fmtDate(lot.date)}</div></div>
+        <div class="kv"><div class="k">Order ID</div><div class="v mono">${lot.orderId ? escapeHtml(lot.orderId) : '—'}</div></div>
+        <div class="kv"><div class="k">Card used</div><div class="v mono">${lot.creditCard ? escapeHtml(lot.creditCard) : '—'}</div></div>
+      </div>
+    </div>
+
+    <div class="section-label">Items (${lot.items.length})</div>
+    <div class="form-card">
+      ${lot.items.map(it => `
+        <div class="detail-item">
+          <div>
+            <div class="di-name">${escapeHtml(it.name)}</div>
+            <div class="di-sub">${it.color ? escapeHtml(it.color) + ' · ' : ''}${it.qty} pcs × ${fmtMoney(it.rate)}</div>
+          </div>
+          <div class="di-amt">${fmtMoney(lotItemTotal(it))}</div>
+        </div>
+      `).join('')}
+    </div>
+
+    <button class="secondary" id="editBtn">Edit lot</button>
+    <button class="danger" id="deleteBtn">Delete lot</button>
+  `;
+  document.getElementById('content').innerHTML = html;
+  document.getElementById('backBtn').addEventListener('click', ()=>{ state.tab=state.detailReturnTab||'list'; state.viewingId=null; render(); });
+  document.getElementById('editBtn').addEventListener('click', ()=> openEdit(lot.id, state.detailReturnTab||'list'));
+  document.getElementById('deleteBtn').addEventListener('click', ()=>{
+    if(confirm(`Delete ${lotNumberLabel(lot.number)} from ${lot.vendor}? This can't be undone.`)) deleteLot(lot.id);
+  });
+  document.querySelectorAll('[data-status]').forEach(el=>{
+    el.addEventListener('click', ()=>{
+      const [id, field] = el.dataset.status.split('|');
+      toggleStatus(id, field);
+    });
+  });
+}
+
+/* ============================ RENDER: FORM (ADD/EDIT) ============================ */
+function renderForm(){
+  const d = state.draft;
+  if(d.totalTouched === undefined) d.totalTouched = false;
+  if(!d.totalTouched) d.total = computedItemsTotal(d.items);
+  else if(d.total === undefined || d.total === null || d.total === '') d.total = computedItemsTotal(d.items);
+  const isEdit = !!state.editingId;
+
+  const html = `
+    <div class="header-row">
+      <div class="back-btn" id="backBtn"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#1F2A24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg></div>
+      <div class="header-title">${isEdit ? 'Edit lot' : 'New lot'}<div class="sub">${lotNumberLabel(d.number)}</div></div>
+    </div>
+
+    <div class="form-card">
+      <div class="field">
+        <label>Purchased from</label>
+        <input id="f_vendor" placeholder="Vendor / supplier name" value="${escapeHtml(d.vendor)}" />
+      </div>
+      <div class="field-row">
+        <div class="field">
+          <label>Date</label>
+          <input id="f_date" type="date" value="${d.date}" />
+        </div>
+        <div class="field">
+          <label>Order ID</label>
+          <input id="f_orderId" placeholder="e.g. ORD-4821" value="${escapeHtml(d.orderId)}" />
+        </div>
+      </div>
+      <div class="field">
+        <label>Credit card used</label>
+        <input id="f_card" placeholder="e.g. HDFC •••4521" value="${escapeHtml(d.creditCard)}" />
+      </div>
+    </div>
+
+    <div class="section-label">Items in this lot</div>
+    ${d.items.map((it, idx) => `
+      <div class="item-row" data-item="${it.id}">
+        <div class="item-head">
+          <span class="item-idx">ITEM ${idx+1}</span>
+          ${d.items.length > 1 ? `<button class="remove-btn" data-remove="${it.id}">Remove</button>` : ''}
+        </div>
+        <div class="item-grid">
+          <div class="full">
+            <input class="i_name" placeholder="Item name" value="${escapeHtml(it.name)}" />
+          </div>
+          <input class="i_qty" type="number" min="0" inputmode="numeric" placeholder="Quantity" value="${it.qty}" />
+          <input class="i_color" placeholder="Color" value="${escapeHtml(it.color)}" />
+          <input class="i_rate full" type="number" min="0" step="0.01" inputmode="decimal" placeholder="Rate per pc (₹)" value="${it.rate}" />
+        </div>
+        <div class="item-amount">${fmtMoney(lotItemTotal(it))}</div>
+      </div>
+    `).join('')}
+    <button class="add-item-btn" id="addItemBtn">+ Add another item</button>
+
+    <div class="lot-total-bar">
+      <div>
+        <span class="lbl">Lot total ${d.totalTouched ? '· edited' : '· auto'}</span>
+        <div id="recalcBtn" class="recalc-link" style="display:${d.totalTouched ? 'block':'none'};">Recalculate from items</div>
+      </div>
+      <input id="f_total" class="mono total-input" type="number" step="0.01" inputmode="decimal" value="${d.total}" />
+    </div>
+
+    <button class="primary" id="saveLotBtn">${isEdit ? 'Save changes' : 'Save lot'}</button>
+    <button class="secondary" id="cancelBtn">Cancel</button>
+  `;
+  document.getElementById('content').innerHTML = html;
+
+  document.getElementById('backBtn').addEventListener('click', cancelForm);
+  document.getElementById('cancelBtn').addEventListener('click', cancelForm);
+  document.getElementById('saveLotBtn').addEventListener('click', saveDraft);
+  document.getElementById('addItemBtn').addEventListener('click', addItemRow);
+
+  document.getElementById('f_total').addEventListener('input', e=>{
+    state.draft.total = e.target.value;
+    state.draft.totalTouched = true;
+    const recalc = document.getElementById('recalcBtn');
+    if(recalc) recalc.style.display = 'block';
+    const lbl = document.querySelector('.lot-total-bar .lbl');
+    if(lbl) lbl.textContent = 'Lot total · edited';
+  });
+  document.getElementById('recalcBtn').addEventListener('click', ()=>{
+    state.draft.totalTouched = false;
+    state.draft.total = computedItemsTotal(state.draft.items);
+    render();
+  });
+
+  document.getElementById('f_vendor').addEventListener('input', e=> updateDraftField('vendor', e.target.value));
+  document.getElementById('f_date').addEventListener('input', e=> updateDraftField('date', e.target.value));
+  document.getElementById('f_orderId').addEventListener('input', e=> updateDraftField('orderId', e.target.value));
+  document.getElementById('f_card').addEventListener('input', e=> updateDraftField('creditCard', e.target.value));
+
+  document.querySelectorAll('[data-remove]').forEach(btn=>{
+    btn.addEventListener('click', ()=> removeItemRow(btn.dataset.remove));
+  });
+
+  document.querySelectorAll('.item-row').forEach(row=>{
+    const itemId = row.dataset.item;
+    row.querySelector('.i_name').addEventListener('input', e=>{ updateItemField(itemId,'name', e.target.value); syncItemAmount(row, itemId); });
+    row.querySelector('.i_qty').addEventListener('input', e=>{ updateItemField(itemId,'qty', e.target.value); syncItemAmount(row, itemId); });
+    row.querySelector('.i_color').addEventListener('input', e=> updateItemField(itemId,'color', e.target.value));
+    row.querySelector('.i_rate').addEventListener('input', e=>{ updateItemField(itemId,'rate', e.target.value); syncItemAmount(row, itemId); });
+  });
+}
+
+function syncItemAmount(row, itemId){
+  const it = state.draft.items.find(i=>i.id===itemId);
+  row.querySelector('.item-amount').textContent = fmtMoney(lotItemTotal(it));
+  if(!state.draft.totalTouched){
+    state.draft.total = computedItemsTotal(state.draft.items);
+    const totalInput = document.getElementById('f_total');
+    if(totalInput) totalInput.value = state.draft.total;
+  }
+}
+
+/* ============================ RENDER: SUMMARY ============================ */
+function renderSummary(){
+  const filter = state.summaryFilter;
+  const lots = filterLotsByPeriod(filter);
+
+  const totalValue = lots.reduce((s,l)=> s + lotTotal(l), 0);
+  const totalItems = lots.reduce((s,l)=> s + lotQty(l), 0);
+  const stockDonePct = lots.length ? (lots.filter(l=>l.stockReceived).length / lots.length * 100) : 0;
+  const paymentDonePct = lots.length ? (lots.filter(l=>l.paymentDone).length / lots.length * 100) : 0;
+
+  const byVendor = {};
+  const byCard = {};
+  lots.forEach(l=>{
+    byVendor[l.vendor] = (byVendor[l.vendor]||0) + lotTotal(l);
+    const card = l.creditCard || 'Not recorded';
+    byCard[card] = (byCard[card]||0) + lotTotal(l);
+  });
+  const vendorRows = Object.entries(byVendor).sort((a,b)=>b[1]-a[1]);
+  const cardRows = Object.entries(byCard).sort((a,b)=>b[1]-a[1]);
+  const maxVendor = Math.max(1, ...vendorRows.map(r=>r[1]));
+  const maxCard = Math.max(1, ...cardRows.map(r=>r[1]));
+
+  const filters = [
+    {id:'all', label:'All time'},
+    {id:'month', label:monthLabel(currentMonthKey())},
+    {id:'lastmonth', label:monthLabel(monthKeyOffset(-1))}
+  ];
+
+  let html = `
+    <div class="header-row">
+      <div class="header-title">Summary<div class="sub">Everything stocked, at a glance</div></div>
+    </div>
+    <div class="filter-row">
+      ${filters.map(f=>`<div class="filter-chip ${filter===f.id?'active':''}" data-filter="${f.id}">${f.label}</div>`).join('')}
+    </div>
+    <div class="stat-strip">
+      <div class="stat-box"><div class="num">${lots.length}</div><div class="lbl">Lots</div></div>
+      <div class="stat-box"><div class="num">${totalItems}</div><div class="lbl">Pcs Stocked</div></div>
+      <div class="stat-box"><div class="num mono" style="font-size:15px;">${fmtMoney(totalValue)}</div><div class="lbl">Total Value</div></div>
+    </div>
+  `;
+
+  if(lots.length === 0){
+    html += `
+      <div class="empty-state">
+        <div class="icon">📊</div>
+        <div class="title">Nothing to summarize${filter==='all' ? ' yet' : ' for this period'}</div>
+        <div class="desc">${filter==='all' ? 'Log a lot and this page will break down spend by vendor and card.' : 'Try switching to All time, or log a lot for this period.'}</div>
+      </div>
+    `;
+  } else {
+    html += `
+      <div class="donut-grid">
+        <div class="donut-card">
+          <div class="donut-title">Stock received</div>
+          ${donutSVG(stockDonePct, '#C98A2C', '#E9E4D6')}
+          <div class="donut-sub">${lots.filter(l=>l.stockReceived).length} of ${lots.length} lots</div>
+        </div>
+        <div class="donut-card">
+          <div class="donut-title">Payments done</div>
+          ${donutSVG(paymentDonePct, '#3B6E5C', '#E9E4D6')}
+          <div class="donut-sub">${lots.filter(l=>l.paymentDone).length} of ${lots.length} lots</div>
+        </div>
+      </div>
+    `;
+
+    if(filter === 'all'){
+      const trend = monthlyTrend(state.lots, 6);
+      const maxTrend = Math.max(1, ...trend.map(t=>t.value));
+      html += `<div class="section-label">Monthly spend trend</div><div class="form-card">
+        <div class="trend-chart">
+          ${trend.map(t=>`
+            <div class="trend-bar-wrap">
+              <span class="trend-val">${t.value ? fmtMoney(t.value).replace('₹','') : ''}</span>
+              <div class="trend-bar ${t.isCurrent?'current':''}" style="height:${Math.max(4, (t.value/maxTrend*90))}%;"></div>
+              <span class="trend-lbl">${t.label}</span>
+            </div>
+          `).join('')}
+        </div>
+      </div>`;
+    }
+
+    html += `<div class="section-label">By vendor</div><div class="form-card">`;
+    html += vendorRows.map(([name,val])=>`
+      <div class="breakdown-row">
+        <span class="name">${escapeHtml(name)}</span>
+        <div class="bar-wrap"><div class="bar" style="width:${(val/maxVendor*100).toFixed(0)}%"></div></div>
+        <span class="val">${fmtMoney(val)} <span style="opacity:.6;">· ${totalValue ? (val/totalValue*100).toFixed(0) : 0}%</span></span>
+      </div>
+    `).join('');
+    html += `</div>`;
+
+    html += `<div class="section-label">By credit card</div><div class="form-card">`;
+    html += cardRows.map(([name,val])=>`
+      <div class="breakdown-row">
+        <span class="name">${escapeHtml(name)}</span>
+        <div class="bar-wrap"><div class="bar" style="width:${(val/maxCard*100).toFixed(0)}%"></div></div>
+        <span class="val">${fmtMoney(val)} <span style="opacity:.6;">· ${totalValue ? (val/totalValue*100).toFixed(0) : 0}%</span></span>
+      </div>
+    `).join('');
+    html += `</div>`;
+  }
+
+  document.getElementById('content').innerHTML = html;
+  document.querySelectorAll('[data-filter]').forEach(el=>{
+    el.addEventListener('click', ()=>{ state.summaryFilter = el.dataset.filter; render(); });
+  });
+}
+
+/* ============================ MASTER RENDER ============================ */
+function render(){
+  if(!state.loaded){
+    document.getElementById('content').innerHTML = `<div class="loading">Opening the ledger…</div>`;
+    return;
+  }
+  if(state.tab === 'list') renderList();
+  else if(state.tab === 'pending') renderPending();
+  else if(state.tab === 'dues') renderDues();
+  else if(state.tab === 'add') renderForm();
+  else if(state.tab === 'detail') renderDetail();
+  else if(state.tab === 'summary') renderSummary();
+  renderNav();
+}
+
+/* ============================ INIT ============================ */
 (async function init(){
   await loadData();
   render();
+  if('serviceWorker' in navigator){
+    window.addEventListener('load', ()=>{
+      navigator.serviceWorker.register('service-worker.js').catch(()=>{ /* offline support unavailable, app still works */ });
+    });
+  }
 })();
 </script>
 </body>
