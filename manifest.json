@@ -1,17 +1,21 @@
 {
-  "name": "Lotbook — Stock & Purchase Manager",
+  "name": "Lotbook Stock Manager",
   "short_name": "Lotbook",
-  "description": "Track stock lots, purchases, vendors, and payments.",
-  "start_url": "./stock-manager.html",
-  "scope": "./",
+  "start_url": "/lotbook/index.html",
+  "scope": "/lotbook/",
   "display": "standalone",
-  "orientation": "portrait",
-  "background_color": "#F3F1EC",
+  "background_color": "#1F2A24",
   "theme_color": "#1F2A24",
   "icons": [
-    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
-    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
-    { "src": "icon-192-maskable.png", "sizes": "192x192", "type": "image/png", "purpose": "maskable" },
-    { "src": "icon-512-maskable.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
   ]
 }
